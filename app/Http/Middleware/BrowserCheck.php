@@ -15,7 +15,11 @@ class BrowserCheck
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$this->isBrowser($request)) {
+        
+        $postmanToken = $request->header('Postman-Token');
+
+        // Check for the presence of headers that indicate a Postman request
+        if (!empty($postmanToken)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized request',
@@ -24,11 +28,5 @@ class BrowserCheck
         }
 
         return $next($request);
-    }
-
-    private function isBrowser(Request $request): bool
-    {
-        $userAgent = $request->header('User-Agent');
-        return $userAgent && !preg_match('/(Postman|Insomnia|curl|HTTPie|Wget)/i', $userAgent);
     }
 }
